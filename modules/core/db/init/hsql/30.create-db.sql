@@ -190,7 +190,7 @@ values ('e48d5196-8376-052d-6f5a-66d36a63262e', 1, '2019-03-07 17:04:43', 'admin
 
 insert into SEC_PERMISSION
 (ID, VERSION, CREATE_TS, CREATED_BY, UPDATE_TS, UPDATED_BY, DELETE_TS, DELETED_BY, PERMISSION_TYPE, TARGET, VALUE_, ROLE_ID)
-values ('34492f6c-71b5-cbd7-ff6f-bb17c911da6a', 1, '2019-03-07 08:09:44', 'admin', '2019-03-07 08:09:44', null, null, null, 40, 'cuba.restApi.enabled', 0, 'a22e037d-ce94-8699-0c7c-953dc2e3610f');
+values ('d2f4eaea-f26b-6492-d44c-46b776c951f8', 1, '2019-12-25 19:30:54', 'admin', '2019-12-25 19:30:54', null, null, null, 40, 'cuba.restApi.fileUpload.enabled', 0, 'a22e037d-ce94-8699-0c7c-953dc2e3610f');
 
 insert into SEC_PERMISSION
 (ID, VERSION, CREATE_TS, CREATED_BY, UPDATE_TS, UPDATED_BY, DELETE_TS, DELETED_BY, PERMISSION_TYPE, TARGET, VALUE_, ROLE_ID)
