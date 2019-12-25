@@ -15,7 +15,7 @@ export class PetclinicOwnerBrowser extends React.Component {
   fields = ['firstName', 'lastName', 'address', 'city', 'email', 'telephone',];
 
   @observable
-  selectedRowId: string | undefined;
+  selectedRowKey: string | undefined;
 
   showDeletionDialog = (e: SerializedEntity<Owner>) => {
     Modal.confirm({
@@ -23,7 +23,7 @@ export class PetclinicOwnerBrowser extends React.Component {
       okText: 'Delete',
       cancelText: 'Cancel',
       onOk: () => {
-        this.selectedRowId = undefined;
+        this.selectedRowKey = undefined;
         return this.dataCollection.delete(e);
       }
     });
@@ -35,21 +35,22 @@ export class PetclinicOwnerBrowser extends React.Component {
         (<Link to={PetclinicOwnerManagement.PATH + '/' + PetclinicOwnerManagement.NEW_SUBPATH} key='create'>
           <Button htmlType='button'
                   style={{margin: '0 12px 12px 0'}}
-                  type='default'>
+                  type="primary"
+                  icon="plus">
             Create
           </Button>
         </Link>),
-        (<Link to={PetclinicOwnerManagement.PATH + '/' + this.selectedRowId} key='edit'>
+        (<Link to={PetclinicOwnerManagement.PATH + '/' + this.selectedRowKey} key='edit'>
           <Button htmlType='button'
                   style={{margin: '0 12px 12px 0'}}
-                  disabled={!this.selectedRowId}
+                  disabled={!this.selectedRowKey}
                   type='default'>
             Edit
           </Button>
         </Link>),
         (<Button htmlType='button'
                  style={{margin: '0 12px 12px 0'}}
-                 disabled={!this.selectedRowId}
+                 disabled={!this.selectedRowKey}
                  onClick={this.deleteSelectedRow}
                  key='remove'
                  type='default'>
@@ -61,9 +62,9 @@ export class PetclinicOwnerBrowser extends React.Component {
     return (
       <DataTable dataCollection={this.dataCollection}
                  fields={this.fields}
-                 onSelectedRowChange={this.onSelectedRowChange}
+                 onRowSelectionChange={this.handleRowSelectionChange}
+                 hideSelectionColumn={true}
                  buttons={buttons}
-                 defaultSort={'-updateTs'}
       />
     );
   }
@@ -79,11 +80,11 @@ export class PetclinicOwnerBrowser extends React.Component {
     return record;
   }
 
-  onSelectedRowChange = (selectedRowId: string) => {
-    this.selectedRowId = selectedRowId;
+  handleRowSelectionChange = (selectedRowKeys: string[]) => {
+    this.selectedRowKey = selectedRowKeys[0];
   };
 
   deleteSelectedRow = () => {
-    this.showDeletionDialog(this.getRecordById(this.selectedRowId!));
+    this.showDeletionDialog(this.getRecordById(this.selectedRowKey!));
   };
 }

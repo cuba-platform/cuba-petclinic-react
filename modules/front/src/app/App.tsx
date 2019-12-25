@@ -8,8 +8,8 @@ import Centered from "./common/Centered";
 import AppHeader from "./header/AppHeader";
 import {NavLink, Route, Switch} from "react-router-dom";
 import HomePage from "./home/HomePage";
-import {getRouteList, mainRoutes, RouteInfo} from "../routing";
-import {injectMainStore, MainStoreInjected} from "@cuba-platform/react";
+import {menuItems} from "../routing";
+import {injectMainStore, MainStoreInjected, RouteItem, SubMenu} from "@cuba-platform/react";
 
 @injectMainStore
 @observer
@@ -51,18 +51,20 @@ class App extends React.Component<MainStoreInjected> {
               <Menu.Item key="1">
                 <NavLink to={'/'}><Icon type="home"/>Home</NavLink>
               </Menu.Item>
-              {mainRoutes.map((route) =>
-                <MenuItem key={route.menuLink} route={route}/>
-              )}
+              {menuItems.map(item => menuItem(item))}
             </Menu>
           </Layout.Sider>
-          <Layout style={{ padding: '24px 24px 24px' }}>
+          <Layout style={{padding: '24px 24px 24px'}}>
             <Layout.Content>
               <Switch>
                 <Route exact={true} path="/" component={HomePage}/>
-                {getRouteList().map((route) =>
-                  <Route key={route.pathPattern} path={route.pathPattern} component={route.component}/>
-                )}
+                {collectRouteItems(menuItems).map(route => (
+                  <Route
+                    key={route.pathPattern}
+                    path={route.pathPattern}
+                    component={route.component}
+                  />
+                ))}
               </Switch>
             </Layout.Content>
           </Layout>
@@ -72,24 +74,46 @@ class App extends React.Component<MainStoreInjected> {
   }
 }
 
-interface MenuItemParameters {
-  route: RouteInfo;
+function menuItem(item: RouteItem | SubMenu) {
+  // Sub Menu
+
+  if ((item as any).items != null) {
+    //recursively walk through sub menus
+    return (
+      <Menu.SubMenu title={item.caption}>
+        {(item as SubMenu).items.map(ro => menuItem(ro))}
+      </Menu.SubMenu>
+    );
+  }
+
+  // Route Item
+
+  const {menuLink} = item as RouteItem;
+
+  return (
+    <Menu.Item key={menuLink}>
+      <NavLink to={menuLink}>
+        <Icon type="bars"/>
+        {item.caption}
+      </NavLink>
+    </Menu.Item>
+  );
 }
 
-function MenuItem({route, ...rest}: MenuItemParameters) {
-  return (
-    route.isMenu ? (
-      <Menu.SubMenu title={route.caption} {...rest}>
-        {route.subItems && route.subItems.map(subRoute =>
-          <MenuItem key={subRoute.menuLink} route={subRoute} {...rest}/>
-        )}
-      </Menu.SubMenu>
-    ) : (
-      <Menu.Item {...rest}>
-        <NavLink to={route.menuLink}>{route.caption}</NavLink>
-      </Menu.Item>
-    )
-  )
+function collectRouteItems(items: Array<RouteItem | SubMenu>): RouteItem[] {
+  return items.reduce(
+    (acc, curr) => {
+      if ((curr as SubMenu).items == null) {
+        // Route item
+        acc.push(curr as RouteItem);
+      } else {
+        // Items from sub menu
+        acc.push(...collectRouteItems((curr as SubMenu).items));
+      }
+      return acc;
+    },
+    [] as Array<RouteItem>
+  );
 }
 
 export default App;

@@ -4,23 +4,13 @@ import {PetclinicSpecialtyManagement} from './app/specialty/PetclinicSpecialtyMa
 import {PetclinicPetManagement} from './app/pet/PetclinicPetManagement';
 import {PetclinicOwnerManagement} from './app/owner/PetclinicOwnerManagement';
 import {PetclinicPetTypeManagement} from './app/pettype/PetclinicPetTypeManagement';
+import {getMenuItems} from "@cuba-platform/react";
 
-export interface RouteInfo {
-  pathPattern?: string;
-  menuLink: string;
-  component?: any;
-  caption: string;
-  isMenu?: boolean;
-  subItems?: RouteInfo[];
-}
+export const menuItems = getMenuItems();
 
-export const mainRoutes: RouteInfo[] = [];
-
-mainRoutes.push({
-  caption: "Petclinic",
-  menuLink: "petclinic",
-  isMenu: true,
-  subItems: [
+const petclinicMenu = {
+  caption: 'Petclinic',
+  items: [
     {
       pathPattern: PetclinicOwnerManagement.PATH + '/:entityId?',
       menuLink: PetclinicOwnerManagement.PATH,
@@ -46,13 +36,12 @@ mainRoutes.push({
       caption: 'Visits'
     }
   ]
-});
+};
+menuItems.push(petclinicMenu);
 
-mainRoutes.push({
-  caption: "Masted Data",
-  menuLink: "mastedData",
-  isMenu: true,
-  subItems: [
+const mastedDataMenu = {
+  caption: 'Master Data',
+  items: [
     {
       pathPattern: PetclinicPetTypeManagement.PATH + '/:entityId?',
       menuLink: PetclinicPetTypeManagement.PATH,
@@ -66,24 +55,5 @@ mainRoutes.push({
       caption: 'Specialties'
     }
   ]
-});
-
-
-function flattenRoutes(routes?: RouteInfo[]): RouteInfo[] {
-  const list: RouteInfo[] = [];
-  if (!routes) {
-    return list;
-  }
-  for (let route of routes) {
-    if (route.isMenu) {
-      list.push(...flattenRoutes(route.subItems));
-    } else {
-      list.push(route);
-    }
-  }
-  return list;
-}
-
-export function getRouteList() {
-  return flattenRoutes(mainRoutes);
-}
+};
+menuItems.push(mastedDataMenu);

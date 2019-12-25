@@ -9,7 +9,10 @@ import {initializeApp} from "@cuba-platform/rest";
 import {CUBA_APP_URL} from "./config";
 
 import 'antd/dist/antd.css';
+import "@cuba-platform/react/dist/index.min.css";
 import './index.css';
+import { antdLocaleMapping, messagesMapping } from "./i18n/i18nMappings";
+import "moment/locale/ru";
 
 export const cubaREST = initializeApp({
   name: 'petclinic',
@@ -18,12 +21,13 @@ export const cubaREST = initializeApp({
 });
 
 ReactDOM.render(
-  <CubaAppProvider cubaREST={cubaREST}>
+  <CubaAppProvider cubaREST={cubaREST}
+                   messagesMapping={messagesMapping}
+                   antdLocaleMapping={antdLocaleMapping}>
     <HashRouter>
       <Route component={App}/>
     </HashRouter>
-  </CubaAppProvider>
-  ,
+  </CubaAppProvider>,
   document.getElementById('root') as HTMLElement
 );
 // registerServiceWorker();
