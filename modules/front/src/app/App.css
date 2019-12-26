@@ -2,12 +2,14 @@
   height: 100%;
 }
 
-.page-layout-narrow {
+.page-layout-narrow,
+.page-layout-narrow.ant-card {
   max-width: 1024px;
   margin: auto;
 }
 
-.editor-layout-narrow {
+.editor-layout-narrow,
+.editor-layout-narrow.ant-card {
   margin: 0 auto;
   max-width: 600px;
   border: 0;
