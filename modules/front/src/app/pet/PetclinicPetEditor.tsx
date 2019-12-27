@@ -101,7 +101,7 @@ class PetclinicPetEditor extends React.Component<Props> {
           <Form.Item label={<Msg entityName={Pet.NAME} propertyName='generation'/>}
                      key='generation'
                      style={{marginBottom: '12px'}}>{
-            getFieldDecorator('generation')(
+            getFieldDecorator('generation', {rules: [{required: true}]})(
               <FormField entityName={Pet.NAME}
                          propertyName='generation'/>
             )}
