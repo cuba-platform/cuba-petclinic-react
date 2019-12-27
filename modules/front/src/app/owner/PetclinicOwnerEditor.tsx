@@ -7,8 +7,8 @@ import {FormComponentProps} from "antd/lib/form";
 import {Link, Redirect} from "react-router-dom";
 import {action, IReactionDisposer, observable, reaction} from "mobx";
 import {
-  collection,
-  ComparisonType,
+  collection, ColumnDefinition,
+  ComparisonType, DataTable,
   FormField,
   generateDataColumn,
   getCubaREST,
@@ -22,8 +22,7 @@ import {Owner} from "../../cuba/entities/petclinic_Owner";
 import {Pet} from "../../cuba/entities/petclinic_Pet";
 import {SerializedEntity} from "@cuba-platform/rest";
 import {PaginationConfig} from "antd/es/pagination";
-import {SorterResult} from "antd/es/table";
-import {PetType} from "../../cuba/entities/petclinic_PetType";
+import {ColumnProps, SorterResult} from "antd/es/table";
 
 type Props = FormComponentProps & MainStoreInjected & {
   entityId: string;
@@ -46,32 +45,10 @@ class PetclinicOwnerEditor extends React.Component<Props> {
   reactionDisposer: IReactionDisposer;
 
   fields = ['address', 'city', 'email', 'telephone', 'firstName', 'lastName', 'pets',];
-  petFields = ['name', 'identificationNumber', 'generation', 'birthDate', 'type'];
 
   @observable.ref filters: Record<string, string[]> | undefined;
   @observable operator: ComparisonType | undefined;
   @observable petValue: any;
-
-  @action
-  handlePetTableOperatorChange = (operator: ComparisonType) => this.operator = operator;
-
-  @action
-  handlePetTableValueChange = (value: any) => this.petValue = value;
-
-  @action
-  handlePetTableChange = (pagination: PaginationConfig, tableFilters: Record<string, string[]>, sorter: SorterResult<Pet>): void => {
-    this.filters = tableFilters;
-
-    handleTableChange({
-      pagination: pagination,
-      filters: tableFilters,
-      sorter: sorter,
-      defaultSort: '-identificationNumber',
-      fields: this.petFields,
-      mainStore: this.props.mainStore!,
-      dataCollection: this.petsCollection
-    });
-  };
 
   showReleaseDialog = (pet: SerializedEntity<Pet>) => {
     Modal.confirm({
@@ -193,23 +170,10 @@ class PetclinicOwnerEditor extends React.Component<Props> {
           <Form.Item label={<Msg entityName={Owner.NAME} propertyName='pets'/>}
                      key='pets'
                      style={{marginBottom: '12px'}}>{
-            petsTable({
-              items: this.petsCollection.items,
-              fields: this.petFields,
-              entityName: this.petsCollection.entityName,
-              filters: this.filters,
-              operator: this.operator,
-              onOperatorChange: this.handlePetTableOperatorChange,
-              value: this.petValue,
-              onValueChange: this.handlePetTableValueChange,
-              enableSorter: true,
-              enableFilter: true,
-              mainStore: this.props.mainStore!,
-              onChange: this.handlePetTableChange,
-              showSizeChanger: true,
-              itemsCount: this.petsCollection.count,
-              showReleaseDialog: this.showReleaseDialog
-            })
+            <DataTable
+              dataCollection={this.petsCollection}
+              columnDefinitions={this.columnDefinitions()}
+            />
           }
           </Form.Item>
 
@@ -252,100 +216,30 @@ class PetclinicOwnerEditor extends React.Component<Props> {
     this.reactionDisposer();
   }
 
-}
+  columnDefinitions(): Array<string | ColumnDefinition<Pet>> {
+    const columnDefs: Array<string | ColumnDefinition<Pet>> = ['name', 'identificationNumber', 'generation', 'birthDate'];
 
-function petsTable(props: any) {
-  let isMainStoreAvailable = !!props.mainStore
-    && !!props.mainStore.messages
-    && !!props.mainStore.metadata
-    && !!props.mainStore.enums;
+    const petTypesColumn: ColumnDefinition<Pet> = {
+      field: 'type',
+      columnProps: {
+        render: (text, record) => {
+          const type = record.type;
+          if (type != null) {
+            return (
+              <Tag color={type.color ? '#' + type.color : undefined}>{text}</Tag>
+            );
+          } else {
+            return null;
+          }
+        }
+      }
+    };
 
-  if (!isMainStoreAvailable) {
-    return (
-      <div className='cuba-data-table-loader'>
-        <Spin size='large'/>
-      </div>
-    );
-  } else {
-    return (
-      <Table dataSource={props.items.slice()}
-             onChange={props.handleChange}
-             pagination={{
-               showSizeChanger: props.showSizeChanger,
-               total: props.itemsCount,
-             }}
-             columns={[
-               generateDataColumn({
-                 propertyName: 'name',
-                 entityName: props.entityName,
-                 filters: props.filters,
-                 operator: props.operator,
-                 onOperatorChange: props.handleOperatorChange,
-                 value: props.value,
-                 onValueChange: props.handleValueChange,
-                 enableSorter: props.enableSorter,
-                 enableFilter: props.enableFilter,
-                 mainStore: props.mainStore
-               }),
-               generateDataColumn({
-                 propertyName: 'identificationNumber',
-                 entityName: props.entityName,
-                 filters: props.filters,
-                 operator: props.operator,
-                 onOperatorChange: props.handleOperatorChange,
-                 value: props.value,
-                 onValueChange: props.handleValueChange,
-                 enableSorter: props.enableSorter,
-                 enableFilter: props.enableFilter,
-                 mainStore: props.mainStore
-               }),
-               generateDataColumn({
-                 propertyName: 'generation',
-                 entityName: props.entityName,
-                 filters: props.filters,
-                 operator: props.operator,
-                 onOperatorChange: props.handleOperatorChange,
-                 value: props.value,
-                 onValueChange: props.handleValueChange,
-                 enableSorter: props.enableSorter,
-                 enableFilter: props.enableFilter,
-                 mainStore: props.mainStore
-               }),
-               generateDataColumn({
-                 propertyName: 'birthDate',
-                 entityName: props.entityName,
-                 filters: props.filters,
-                 operator: props.operator,
-                 onOperatorChange: props.handleOperatorChange,
-                 value: props.value,
-                 onValueChange: props.handleValueChange,
-                 enableSorter: props.enableSorter,
-                 enableFilter: props.enableFilter,
-                 mainStore: props.mainStore
-               }),
-               {
-                 title: <Msg entityName={Pet.NAME} propertyName='type'/>,
-                 dataIndex: "type",
-                 key: "type",
-                 render: (type: SerializedEntity<PetType>) => (
-                   <Tag color={type.color ? '#' + type.color : undefined}>{type._instanceName}</Tag>
-                 )
-               },
-               {
-                 title: "Action",
-                 key: "action",
-                 render: (pet) => (
-                   <Button type="link"
-                           style={{padding: 0}}
-                           onClick={() => props.showReleaseDialog(pet)}>
-                     Release
-                   </Button>
-                 )
-               }
-             ]}
-      />
-    );
+    columnDefs.push(petTypesColumn);
+
+    return columnDefs;
   }
+
 }
 
 export default Form.create<Props>()(PetclinicOwnerEditor);
