@@ -50,9 +50,9 @@ class PetclinicOwnerEditor extends React.Component<Props> {
   @observable operator: ComparisonType | undefined;
   @observable petValue: any;
 
-  showReleaseDialog = (pet: SerializedEntity<Pet>) => {
+  showReleaseDialog = (pet: Pet) => {
     Modal.confirm({
-      title: `Are you sure you want to release ${pet._instanceName}?`,
+      title: `Are you sure you want to release ${pet.name}?`,
       okText: 'Release',
       cancelText: 'Cancel',
       onOk: () => {
@@ -234,8 +234,22 @@ class PetclinicOwnerEditor extends React.Component<Props> {
         }
       }
     };
-
     columnDefs.push(petTypesColumn);
+
+    const releasePetColumn: ColumnDefinition<Pet> = {
+      columnProps: {
+        title: "Action",
+        key: "action",
+        render: (_text, pet) => (
+          <Button type="link"
+                  style={{padding: 0}}
+                  onClick={() => this.showReleaseDialog(pet)}>
+            Release
+          </Button>
+        )
+      }
+    };
+    columnDefs.push(releasePetColumn);
 
     return columnDefs;
   }
