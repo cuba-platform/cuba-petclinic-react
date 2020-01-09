@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@cuba-platform/react": "file:cuba-platform-react-0.4.1.tgz",
+    "@cuba-platform/react": "file:cuba-platform-react-0.4.2.tgz",
     "@cuba-platform/rest": "^0.7.0",
     "antd": "^3.26.4",
     "mobx": "^4.15.1",

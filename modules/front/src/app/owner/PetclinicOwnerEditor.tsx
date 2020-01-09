@@ -1,18 +1,16 @@
 import * as React from "react";
 import {FormEvent} from "react";
-import {Button, Card, Col, Form, message, Modal, Row, Spin, Table, Tag} from "antd";
+import {Button, Card, Col, Form, message, Modal, Row, Tag} from "antd";
 import {observer} from "mobx-react";
 import {PetclinicOwnerManagement} from "./PetclinicOwnerManagement";
 import {FormComponentProps} from "antd/lib/form";
 import {Link, Redirect} from "react-router-dom";
-import {action, IReactionDisposer, observable, reaction} from "mobx";
+import {IReactionDisposer, observable, reaction} from "mobx";
 import {
   collection, ColumnDefinition,
   ComparisonType, DataTable,
   FormField,
-  generateDataColumn,
   getCubaREST,
-  handleTableChange,
   injectMainStore,
   instance,
   MainStoreInjected,
@@ -20,9 +18,6 @@ import {
 } from "@cuba-platform/react";
 import {Owner} from "../../cuba/entities/petclinic_Owner";
 import {Pet} from "../../cuba/entities/petclinic_Pet";
-import {SerializedEntity} from "@cuba-platform/rest";
-import {PaginationConfig} from "antd/es/pagination";
-import {ColumnProps, SorterResult} from "antd/es/table";
 
 type Props = FormComponentProps & MainStoreInjected & {
   entityId: string;
@@ -173,6 +168,9 @@ class PetclinicOwnerEditor extends React.Component<Props> {
             <DataTable
               dataCollection={this.petsCollection}
               columnDefinitions={this.columnDefinitions()}
+              tableProps={{
+                rowSelection: undefined
+              }}
             />
           }
           </Form.Item>
